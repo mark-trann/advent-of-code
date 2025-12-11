@@ -73,6 +73,44 @@ int minPresses(vector<uint32_t>& buttons, uint32_t target) {
     return res;
 }
 
+///////////////////////////////////////////ALTERNATE SOLUTION//////////////////////////////////////////////////////////////////////////
+int minPressesAlternate(vector<uint32_t>& buttons, uint32_t target) {
+    queue<pair<uint32_t, int>> q;
+    unordered_map<uint32_t, bool> visited;
+    q.emplace(0, 0);
+    while (!q.empty()) {
+        auto [switchStatus, count] = q.front();
+        q.pop();
+        if (switchStatus == target) return count;
+        if (visited[switchStatus]) continue;
+        visited[switchStatus] = true;
+        for (auto button : buttons) {
+            if (!visited[switchStatus ^ button])
+                q.emplace(switchStatus ^ button, count + 1);
+        }
+    }
+    return INFINITY;
+}
+void alternateSolution() {
+    string line;
+    int res = 0;
+    while (getline(cin, line)) {
+        auto closeSq = line.find(']');
+        auto lastRnd = line.find('{') - 2;
+        auto buttonStr = line.substr(closeSq + 2, lastRnd - closeSq - 1);
+        auto buttons = getButtons(buttonStr);
+
+        auto lights = line.substr(1, closeSq - 1);
+        uint32_t target = 0;
+        for (int i = 0; i < static_cast<int>(lights.length()); i++) {
+            if (lights[i] == '#') target |= (1 << i);
+        }
+        res += minPresses(buttons, target);
+    }
+    cout << res << endl;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void solution() {
     string line;
     int res = 0;
